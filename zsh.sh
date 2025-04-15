@@ -146,6 +146,7 @@ fi
 
 
 sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting extract)/' ~/.zshrc
+sed -i  "s/^# zstyle ':omz:update' mode disabled/zstyle ':omz:update' mode disabled/" ~/.zshrc
 
 chsh -s /bin/zsh
 

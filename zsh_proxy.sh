@@ -146,6 +146,7 @@ fi
 
 
 sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting extract)/' ~/.zshrc
+sed -i  "s/^# zstyle ':omz:update' mode disabled/zstyle ':omz:update' mode disabled/" ~/.zshrc
 
 # 提示用户输入 y 或 n
 read -p "是否需要设置当前用户zsh系统代理环境变量? (y/n): " choice
