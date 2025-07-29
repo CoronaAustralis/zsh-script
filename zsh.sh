@@ -101,24 +101,21 @@ start_install() {
 start_install
 
 temp_proxy=""
-temp_proxy_set() {
-    read -p "是否需要临时代理保证git clone和脚本拉取? (y/n): " choice
-
-    if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
-    
-        read -p "请输入代理地址(如http://127.0.0.1:7890),跳过请输入n:" temp_proxy_input
-    
-        if [[ "$temp_proxy_input" != "n" && "$temp_proxy_input" != "N" && -n "$temp_proxy_input" ]]; then
-            temp_proxy="$temp_proxy_input"
-        else
-            unset temp_proxy
-        fi
+proxy_set() {
+    if [[ -n "$http_proxy" ]]; then
+        temp_proxy="$http_proxy"
+    elif [[ -n "$https_proxy" ]]; then
+        temp_proxy="$https_proxy"
+    elif [[ -n "$HTTP_PROXY" ]]; then
+        temp_proxy="$HTTP_PROXY"
+    elif [[ -n "$HTTPS_PROXY" ]]; then
+        temp_proxy="$HTTPS_PROXY"
     else
         unset temp_proxy
     fi
 }
 
-temp_proxy_set
+proxy_set
 
 if [ -n "$temp_proxy" ]; then
     sh -c  "$(wget -O- https://install.ohmyz.sh/  | sed "/exec zsh -l/d" | sed "s|git fetch|git -c http.proxy=$temp_proxy fetch|" | sed "s/read -r opt/opt=y \&\& echo ' '/")"
@@ -147,6 +144,19 @@ fi
 
 sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting extract)/' ~/.zshrc
 sed -i  "s/^# zstyle ':omz:update' mode disabled/zstyle ':omz:update' mode disabled/" ~/.zshrc
+
+
+if [[ -n "$http_proxy" || -n "$HTTP_PROXY" ]]; then
+    temp_proxy="${http_proxy:-$HTTP_PROXY}"
+    echo "#zsh-scrpit http_proxy set" >> ~/.zshrc
+    echo "#export http_proxy=$temp_proxy" >> ~/.zshrc
+elif [[ -n "$https_proxy" || -n "$HTTPS_PROXY" ]]; then
+    temp_proxy="${https_proxy:-$HTTPS_PROXY}"
+    echo "#zsh-scrpit https_proxy set" >> ~/.zshrc
+    echo "#export http_proxy=$temp_proxy" >> ~/.zshrc
+else
+    unset temp_proxy
+fi
 
 chsh -s /bin/zsh
 
